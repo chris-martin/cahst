@@ -1,0 +1,34 @@
+name:                cahst
+version:             0.1.0.0
+license:             Apache-2.0
+license-file:        LICENSE
+author:              Chris Martin
+maintainer:          ch.martin@gmail.com
+build-type:          Simple
+cabal-version:       >=1.10
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Network.Cahst
+                     , Network.Cahst.Message
+                     , Network.Cahst.Protobuf
+  build-depends:       base >=4.8 && <4.9
+                     , aeson
+                     , binary
+                     , bytestring
+                     , cereal
+                     , data-default
+                     , network
+                     , parsers
+                     , protobuf
+                     , text
+                     , tls
+                     , unordered-containers
+  default-language:    Haskell2010
+
+executable cahst
+  hs-source-dirs:      app
+  main-is:             cahst.hs
+  build-depends:       base >=4.8 && <4.9
+                     , cahst
+  default-language:    Haskell2010
