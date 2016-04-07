@@ -10,6 +10,7 @@ module Network.Cahst.Connection
 import qualified Network.Cahst.Message    as M
 import           Network.Cahst.Namespace  (Namespaced (..))
 import qualified Network.Cahst.Protobuf   as P
+import           Network.Cahst.RequestId  (RequestId)
 
 import           Data.Aeson               (ToJSON)
 import qualified Data.Aeson
@@ -34,7 +35,7 @@ import           System.Random            (randomIO)
 
 data Connection = Connection
     { connTlsContext :: TLS.Context
-    , connRequestId  :: IORef M.RequestId
+    , connRequestId  :: IORef RequestId
     }
 
 newConnection :: IO Connection

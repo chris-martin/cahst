@@ -4,16 +4,17 @@
 
 module Network.Cahst.Message
      ( ConnectionMessage(..), HeartbeatMessage(..)
-     , ReceiverMessage(..), ReceiverCommand(..), RequestId(..)
+     , ReceiverMessage(..), ReceiverCommand(..)
      , launch, stop, getStatus, getAppAvailability, setVolume, setMuted
      ) where
 
-import           Network.Cahst.Namespace (Namespaced (..))
-import           Network.Cahst.RequestId (RequestId (..))
+import           Network.Cahst.Namespace    (Namespaced (..))
+import           Network.Cahst.RequestId    (RequestId)
+import           Network.Cahst.UnitInterval (UnitInterval)
 
-import           Data.Aeson              (ToJSON (..), object, (.=))
-import qualified Data.Aeson              as Aeson
-import           Data.Text               (Text)
+import           Data.Aeson                 (ToJSON (..), object, (.=))
+import qualified Data.Aeson                 as Aeson
+import           Data.Text                  (Text)
 
 data ConnectionMessage = Connect | Close
 
@@ -72,7 +73,7 @@ getAppAvailability appIds = ReceiverCommand
     , "appId" .= appIds ]
 
 -- | Volume is between 0 and 1
-setVolume :: Float -> ReceiverCommand
+setVolume :: UnitInterval -> ReceiverCommand
 setVolume x = ReceiverCommand
     [ "type" .= ("SET_VOLUME" :: Text)
     , "volume" .= (object ["level" .= x]) ]

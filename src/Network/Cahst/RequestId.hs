@@ -1,5 +1,5 @@
 module Network.Cahst.RequestId
-    ( RequestId(..)
+    ( RequestId
     ) where
 
 import           Control.Monad  (join)

@@ -15,6 +15,7 @@ library
                      , Network.Cahst.Namespace
                      , Network.Cahst.Protobuf
                      , Network.Cahst.RequestId
+                     , Network.Cahst.UnitInterval
   build-depends:       base >=4.8 && <4.9
                      , aeson
                      , binary
@@ -25,6 +26,7 @@ library
                      , parsers
                      , protobuf
                      , random
+                     , scientific
                      , text
                      , tls
                      , unordered-containers
