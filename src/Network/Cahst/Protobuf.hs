@@ -16,8 +16,7 @@ module Network.Cahst.Protobuf
   , AuthErrorType(..)
 
   -- * Re-export from Data.ProtocolBuffers
-  , encode
-  , putField
+  , decodeMessage, encodeMessage, putField
   ) where
 
 import           Data.ByteString      (ByteString)

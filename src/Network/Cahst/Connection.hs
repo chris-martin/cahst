@@ -98,7 +98,7 @@ prependLength body = len <> body where
     len = Binary.encode ((fromIntegral $ LBS.length body) :: Int.Int32)
 
 jsonPayload :: (Namespaced a, ToJSON a) => a -> LBS.ByteString
-jsonPayload m = prependLength $ runPutLazy $ P.encode $ jsonCastMessage m
+jsonPayload m = prependLength $ runPutLazy $ P.encodeMessage $ jsonCastMessage m
 
 jsonCastMessage :: (Namespaced a, ToJSON a) => a -> P.CastMessage
 jsonCastMessage m = P.CastMessage
