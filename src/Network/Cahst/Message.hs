@@ -5,7 +5,7 @@
 module Network.Cahst.Message
      ( ConnectionMessage(..), HeartbeatMessage(..)
      , ReceiverMessage(..), ReceiverCommand(..), RequestId(..)
-     , launch, stop, getStatus, getAppAvailability
+     , launch, stop, getStatus, getAppAvailability, setVolume, setMuted
      ) where
 
 import           Network.Cahst.Namespace (Namespaced (..))
@@ -70,3 +70,14 @@ getAppAvailability :: [Text] -> ReceiverCommand
 getAppAvailability appIds = ReceiverCommand
     [ "type" .= ("GET_APP_AVAILABILITY" :: Text)
     , "appId" .= appIds ]
+
+-- | Volume is between 0 and 1
+setVolume :: Float -> ReceiverCommand
+setVolume x = ReceiverCommand
+    [ "type" .= ("SET_VOLUME" :: Text)
+    , "volume" .= (object ["level" .= x]) ]
+
+setMuted :: Bool -> ReceiverCommand
+setMuted x = ReceiverCommand
+    [ "type" .= ("SET_VOLUME" :: Text)
+    , "volume" .= (object ["muted" .= x]) ]

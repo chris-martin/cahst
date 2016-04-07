@@ -13,7 +13,8 @@ main = do
 
     C.send c M.Connect
     C.send c M.getStatus
-    C.send c $ M.launch "YouTube"
+    --C.send c $ M.launch "YouTube"
+    C.send c $ M.setVolume 0.6
 
     forever $ do
         x <- C.recv c
