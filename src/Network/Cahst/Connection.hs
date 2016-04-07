@@ -83,7 +83,8 @@ instance Send M.ReceiverMessage where
 
 instance Send M.ReceiverCommand where
     send conn x = do
-        requestId <- atomicModifyIORef' (connRequestId conn) (\i -> (wrapSucc i, i))
+        requestId <- atomicModifyIORef' (connRequestId conn)
+                                        (\i -> (wrapSucc i, i))
         send conn $ M.ReceiverMessage x requestId
 
 wrapSucc :: (Bounded a, Enum a, Eq a) => a -> a
