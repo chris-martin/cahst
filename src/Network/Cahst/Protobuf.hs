@@ -33,13 +33,13 @@ data ProtocolVersion = CASTV2_1_0
   deriving (Enum, Show)
 
 data CastMessage = CastMessage
-  { protocol_version :: Required 1 (Enumeration ProtocolVersion)
-  , source_id        :: Required 2 (Value Text)
-  , destination_id   :: Required 3 (Value Text)
-  , namespace        :: Required 4 (Value Text)
-  , payload_type     :: Required 5 (Enumeration PayloadType)
-  , payload_utf8     :: Optional 6 (Value Text)
-  , payload_binary   :: Optional 7 (Value ByteString)
+  { protocolVersion :: Required 1 (Enumeration ProtocolVersion)
+  , sourceId        :: Required 2 (Value Text)
+  , destinationId   :: Required 3 (Value Text)
+  , namespace       :: Required 4 (Value Text)
+  , payloadType     :: Required 5 (Enumeration PayloadType)
+  , payloadUtf8     :: Optional 6 (Value Text)
+  , payloadBinary   :: Optional 7 (Value ByteString)
   } deriving (Generic, Show)
 
 instance Encode CastMessage
@@ -52,9 +52,9 @@ instance Encode AuthChallenge
 instance Decode AuthChallenge
 
 data AuthResponse = AuthResponse
-  { signature               :: Required 1 (Value ByteString)
-  , client_auth_certificate :: Required 2 (Value ByteString)
-  , client_ca               :: Required 3 (Value ByteString)
+  { signature             :: Required 1 (Value ByteString)
+  , clientAuthCertificate :: Required 2 (Value ByteString)
+  , clientCa              :: Required 3 (Value ByteString)
   } deriving (Generic, Show)
 
 instance Encode AuthResponse
@@ -64,7 +64,7 @@ data AuthErrorType = INTERNAL_ERROR | NO_TLS
   deriving (Enum, Show)
 
 data AuthError = AuthError
-  { error_type :: Required 1 (Enumeration AuthErrorType)
+  { errorType :: Required 1 (Enumeration AuthErrorType)
   } deriving (Generic, Show)
 
 instance Encode AuthError

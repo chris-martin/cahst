@@ -102,13 +102,13 @@ jsonPayload m = prependLength $ runPutLazy $ P.encode $ jsonCastMessage m
 
 jsonCastMessage :: (Namespaced a, ToJSON a) => a -> P.CastMessage
 jsonCastMessage m = P.CastMessage
-    { P.protocol_version = P.putField P.CASTV2_1_0
-    , P.source_id        = P.putField "sender-0"
-    , P.destination_id   = P.putField "receiver-0"
-    , P.namespace        = P.putField $ namespace m
-    , P.payload_type     = P.putField P.StringPayloadType
-    , P.payload_utf8     = P.putField $ Just $ encodeJsonText m
-    , P.payload_binary   = P.putField Nothing
+    { P.protocolVersion = P.putField P.CASTV2_1_0
+    , P.sourceId        = P.putField "sender-0"
+    , P.destinationId   = P.putField "receiver-0"
+    , P.namespace       = P.putField $ namespace m
+    , P.payloadType     = P.putField P.StringPayloadType
+    , P.payloadUtf8     = P.putField $ Just $ encodeJsonText m
+    , P.payloadBinary   = P.putField Nothing
     }
 
 encodeJsonText :: ToJSON a => a -> T.Text
