@@ -10,11 +10,11 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Network.Cahst
+                     , Network.Cahst.Connection
                      , Network.Cahst.Message
                      , Network.Cahst.Namespace
                      , Network.Cahst.Protobuf
                      , Network.Cahst.RequestId
-                     , Network.Cahst.Socket
   build-depends:       base >=4.8 && <4.9
                      , aeson
                      , binary

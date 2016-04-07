@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Network.Cahst.Socket
+module Network.Cahst.Connection
     ( Connection(..)
     , newConnection
     , send

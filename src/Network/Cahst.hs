@@ -2,19 +2,19 @@
 
 module Network.Cahst (main) where
 
-import qualified Network.Cahst.Message as M
-import qualified Network.Cahst.Socket  as S
+import qualified Network.Cahst.Connection as C
+import qualified Network.Cahst.Message    as M
 
-import           Control.Monad         (forever)
+import           Control.Monad            (forever)
 
 main :: IO ()
 main = do
-    c <- S.newConnection
+    c <- C.newConnection
 
-    S.send c M.Connect
-    S.send c M.getStatus
-    S.send c $ M.launch "YouTube"
+    C.send c M.Connect
+    C.send c M.getStatus
+    C.send c $ M.launch "YouTube"
 
     forever $ do
-        x <- S.recv c
+        x <- C.recv c
         putStrLn $ show x
