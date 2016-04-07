@@ -11,7 +11,9 @@ library
   hs-source-dirs:      src
   exposed-modules:     Network.Cahst
                      , Network.Cahst.Message
+                     , Network.Cahst.Namespace
                      , Network.Cahst.Protobuf
+                     , Network.Cahst.Socket
   build-depends:       base >=4.8 && <4.9
                      , aeson
                      , binary

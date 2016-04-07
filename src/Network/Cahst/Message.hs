@@ -3,37 +3,21 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Network.Cahst.Message
-     (
-     -- * Namespaces
-       Namespace(..)
-     , nsStr
-
-     -- * Messages
-     , Message(..)
-     , ConnectionMessage(..)
-     , HeartbeatMessage(..)
-     , ReceiverMessage(..)
-     , ReceiverCommand(..)
+     ( ConnectionMessage(..), HeartbeatMessage(..)
+     , ReceiverMessage(..), ReceiverCommand(..), RequestId
+     , launch, stop, getStatus, getAppAvailability
      ) where
 
-import           Data.Aeson (ToJSON (..), object, (.=))
-import           Data.Text  (Text)
+import           Network.Cahst.Namespace (Namespaced (..))
 
-data Namespace = ConnectionNS | HeartbeatNS | ReceiverNS | AuthNS
-
-nsStr :: Namespace -> String
-nsStr ConnectionNS = "urn:x-cast:com.google.cast.tp.connection"
-nsStr HeartbeatNS  = "urn:x-cast:com.google.cast.tp.heartbeat"
-nsStr ReceiverNS   = "urn:x-cast:com.google.cast.receiver"
-nsStr AuthNS       = "urn:x-cast:com.google.cast.tp.deviceauth"
-
-class Message a where
-    messageNs :: a -> Namespace
+import           Data.Aeson              (ToJSON (..), object, (.=))
+import qualified Data.Aeson              as Aeson
+import           Data.Text               (Text)
 
 data ConnectionMessage = Connect | Close
 
-instance Message ConnectionMessage where
-    messageNs _ = ConnectionNS
+instance Namespaced ConnectionMessage where
+    namespace _ = "urn:x-cast:com.google.cast.tp.connection"
 
 instance ToJSON ConnectionMessage where
     toJSON Connect = object
@@ -43,8 +27,8 @@ instance ToJSON ConnectionMessage where
 
 data HeartbeatMessage = Ping | Pong
 
-instance Message HeartbeatMessage where
-    messageNs _ = HeartbeatNS
+instance Namespaced HeartbeatMessage where
+    namespace _ = "urn:x-cast:com.google.cast.tp.heartbeat"
 
 instance ToJSON HeartbeatMessage where
     toJSON Ping = object
@@ -52,26 +36,38 @@ instance ToJSON HeartbeatMessage where
     toJSON Pong = object
         [ "type" .= ("PONG" :: Text) ]
 
-data ReceiverCommand =
-    Launch Text | Stop Text | GetStatus
-    | GetAppAvailability [Text]
+type RequestId = Int
 
-data ReceiverMessage = ReceiverMessage ReceiverCommand Int
+data ReceiverCommand = ReceiverCommand
+    { receiverCommandJson :: [(Text, Aeson.Value)] }
 
-instance Message ReceiverMessage where
-    messageNs _ = ReceiverNS
+instance ToJSON ReceiverCommand where
+    toJSON = object . receiverCommandJson
+
+data ReceiverMessage = ReceiverMessage ReceiverCommand RequestId
+
+instance Namespaced ReceiverMessage where
+    namespace _ = "urn:x-cast:com.google.cast.receiver"
 
 instance ToJSON ReceiverMessage where
-    toJSON (ReceiverMessage command requestId) =
-        object $ ("requestId" .= requestId) : case command of
-            Launch appId ->
-                [ "type" .= ("LAUNCH" :: Text)
-                , "appId" .= appId ]
-            Stop sessionId ->
-                [ "type" .= ("STOP" :: Text)
-                , "sessionId" .= sessionId ]
-            GetStatus ->
-                [ "type" .= ("GET_STATUS" :: Text) ]
-            GetAppAvailability appIds ->
-                [ "type" .= ("GET_APP_AVAILABILITY" :: Text)
-                , "appId" .= appIds ]
+    toJSON (ReceiverMessage (ReceiverCommand pairs) requestId) =
+        object $ ("requestId" .= requestId) : pairs
+
+launch :: Text -> ReceiverCommand
+launch appId = ReceiverCommand
+    [ "type" .= ("LAUNCH" :: Text)
+    , "appId" .= appId ]
+
+stop :: Text -> ReceiverCommand
+stop sessionId = ReceiverCommand
+   [ "type" .= ("STOP" :: Text)
+   , "sessionId" .= sessionId ]
+
+getStatus :: ReceiverCommand
+getStatus = ReceiverCommand
+    [ "type" .= ("GET_STATUS" :: Text) ]
+
+getAppAvailability :: [Text] -> ReceiverCommand
+getAppAvailability appIds = ReceiverCommand
+    [ "type" .= ("GET_APP_AVAILABILITY" :: Text)
+    , "appId" .= appIds ]
