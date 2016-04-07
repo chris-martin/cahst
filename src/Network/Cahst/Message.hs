@@ -4,11 +4,12 @@
 
 module Network.Cahst.Message
      ( ConnectionMessage(..), HeartbeatMessage(..)
-     , ReceiverMessage(..), ReceiverCommand(..), RequestId
+     , ReceiverMessage(..), ReceiverCommand(..), RequestId(..)
      , launch, stop, getStatus, getAppAvailability
      ) where
 
 import           Network.Cahst.Namespace (Namespaced (..))
+import           Network.Cahst.RequestId (RequestId (..))
 
 import           Data.Aeson              (ToJSON (..), object, (.=))
 import qualified Data.Aeson              as Aeson
@@ -35,8 +36,6 @@ instance ToJSON HeartbeatMessage where
         [ "type" .= ("PING" :: Text) ]
     toJSON Pong = object
         [ "type" .= ("PONG" :: Text) ]
-
-type RequestId = Int
 
 data ReceiverCommand = ReceiverCommand
     { receiverCommandJson :: [(Text, Aeson.Value)] }

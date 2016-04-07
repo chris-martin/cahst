@@ -13,6 +13,7 @@ library
                      , Network.Cahst.Message
                      , Network.Cahst.Namespace
                      , Network.Cahst.Protobuf
+                     , Network.Cahst.RequestId
                      , Network.Cahst.Socket
   build-depends:       base >=4.8 && <4.9
                      , aeson
@@ -23,6 +24,7 @@ library
                      , network
                      , parsers
                      , protobuf
+                     , random
                      , text
                      , tls
                      , unordered-containers

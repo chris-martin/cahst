@@ -1,6 +1,6 @@
 { mkDerivation, aeson, base, binary, bytestring, cereal
-, data-default, network, parsers, protobuf, stdenv, text, tls
-, unordered-containers
+, data-default, network, parsers, protobuf, random, stdenv, text
+, tls, unordered-containers
 }:
 mkDerivation {
   pname = "cahst";
@@ -10,7 +10,7 @@ mkDerivation {
   isExecutable = true;
   libraryHaskellDepends = [
     aeson base binary bytestring cereal data-default network parsers
-    protobuf text tls unordered-containers
+    protobuf random text tls unordered-containers
   ];
   executableHaskellDepends = [ base ];
   license = stdenv.lib.licenses.asl20;

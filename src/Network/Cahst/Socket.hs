@@ -1,8 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Network.Cahst.Socket
-    ( newTlsContext
-    , jsonPayload
+    ( Connection(..)
+    , newConnection
+    , send
+    , recv
     ) where
 
 import qualified Network.Cahst.Message    as M
@@ -11,13 +13,13 @@ import qualified Network.Cahst.Protobuf   as P
 
 import           Data.Aeson               (ToJSON)
 import qualified Data.Aeson
-import qualified Data.Aeson               as Aeson
 import qualified Data.Aeson.Encode
 import qualified Data.Binary              as Binary
 import qualified Data.ByteString          as BS
 import qualified Data.ByteString.Lazy     as LBS
 import           Data.Default
 import qualified Data.Int                 as Int
+import           Data.IORef               (IORef, atomicModifyIORef', newIORef)
 import           Data.Monoid              ((<>))
 import           Data.Serialize.Put       (runPutLazy)
 import qualified Data.Text                as T
@@ -28,14 +30,23 @@ import qualified Network.Socket           as Sock
 import qualified Network.TLS              as TLS
 import           Network.TLS.Extra.Cipher (ciphersuite_all)
 
-newTlsContext :: IO TLS.Context
-newTlsContext = do
+import           System.Random            (randomIO)
+
+data Connection = Connection
+    { connTlsContext :: TLS.Context
+    , connRequestId  :: IORef M.RequestId
+    }
+
+newConnection :: IO Connection
+newConnection = do
     addr <- getAddr
     s <- Sock.socket Sock.AF_INET Sock.Stream 0
     Sock.connect s addr
     ctx <- TLS.contextNew s tlsParams
     _ <- TLS.handshake ctx
-    return ctx
+    firstRequestId <- randomIO
+    requestIdRef <- newIORef firstRequestId
+    return $ Connection ctx requestIdRef
 
 tlsParams :: TLS.ClientParams
 tlsParams = (TLS.defaultParamsClient "" BS.empty)
@@ -54,6 +65,31 @@ getAddr :: IO Sock.SockAddr
 getAddr = do
     xs <- Sock.getAddrInfo Nothing (Just "192.168.1.103") (Just "8009")
     return $ Sock.addrAddress $ head xs
+
+class Send a where
+    send :: Connection -> a -> IO ()
+
+instance Send M.ConnectionMessage where
+    send conn x = TLS.sendData (connTlsContext conn) (jsonPayload x)
+
+instance Send M.HeartbeatMessage where
+    send conn x = TLS.sendData (connTlsContext conn) (jsonPayload x)
+
+instance Send M.ReceiverMessage where
+    send conn x = do
+      _ <- TLS.sendData (connTlsContext conn) (jsonPayload x)
+      putStrLn $ "Send: " ++ (show $ jsonPayload x)
+
+instance Send M.ReceiverCommand where
+    send conn x = do
+        requestId <- atomicModifyIORef' (connRequestId conn) (\i -> (wrapSucc i, i))
+        send conn $ M.ReceiverMessage x requestId
+
+wrapSucc :: (Bounded a, Enum a, Eq a) => a -> a
+wrapSucc a = if a == maxBound then minBound else succ a
+
+recv :: Connection -> IO BS.ByteString
+recv conn = TLS.recvData $ connTlsContext conn
 
 prependLength :: LBS.ByteString -> LBS.ByteString
 prependLength body = len <> body where

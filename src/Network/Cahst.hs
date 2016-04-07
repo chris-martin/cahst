@@ -7,16 +7,14 @@ import qualified Network.Cahst.Socket  as S
 
 import           Control.Monad         (forever)
 
-import qualified Network.TLS           as TLS
-
 main :: IO ()
 main = do
-    ctx <- S.newTlsContext
+    c <- S.newConnection
 
-    TLS.sendData ctx $ S.jsonPayload M.Connect
-    TLS.sendData ctx $ S.jsonPayload $ M.ReceiverMessage M.getStatus 1
-    TLS.sendData ctx $ S.jsonPayload $ M.ReceiverMessage (M.launch "YouTube") 2
+    S.send c M.Connect
+    S.send c M.getStatus
+    S.send c $ M.launch "YouTube"
 
     forever $ do
-        x <- TLS.recvData ctx
+        x <- S.recv c
         putStrLn $ show x
